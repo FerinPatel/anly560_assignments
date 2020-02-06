@@ -5,7 +5,7 @@ The dictonary has film id, name, all actors first and last name for that film an
 """
 import mysql.connector
 
-### START :: DATA EXTRACTION COMPLETE ##################################################################################
+### START :: DATA EXTRACTION ##################################################################################
 
 mydb = mysql.connector.connect(
   host = "localhost",
@@ -25,7 +25,7 @@ where title like lower('zo%')
 
 data = cur.fetchall()
 
-### END :: DATA EXTRACTION COMPLETE #####################################################################################
+### END :: DATA EXTRACTION #####################################################################################
 
 def display_films(data):
   films_id = {unique_film[3] for unique_film in data}

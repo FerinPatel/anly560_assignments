@@ -3,7 +3,7 @@ SIMPLE APP :: Prints a tuple of all records of film starting with 'zo'
 """
 import mysql.connector
 
-### START :: DATA EXTRACTION COMPLETE ##################################################################################
+### START :: DATA EXTRACTION ##################################################################################
 
 mydb = mysql.connector.connect(
   host = "localhost",
@@ -23,7 +23,7 @@ where title like lower('zo%')
 
 data = cur.fetchall()
 
-### END :: DATA EXTRACTION COMPLETE #####################################################################################
+### END :: DATA EXTRACTION #####################################################################################
 
 """Print all data fetched"""
 [print(row) for row in data]
