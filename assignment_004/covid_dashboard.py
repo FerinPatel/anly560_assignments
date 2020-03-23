@@ -9,73 +9,74 @@ import pandas as pd
 
 app = dash.Dash()
 
-df = pd.read_csv('data/covid_19_data.csv')
+df_acc = pd.read_csv('data/us_covid19_daily.csv')
+df_per_states = pd.read_csv('data/us_states_covid19_daily.csv')
+df_states_abbr = pd.read_csv('data/state_abb.csv')
 
-def cleanData(data):
+# casting types..
+df_per_states['date'] = pd.to_datetime(df_per_states['date'],  format='%Y%m%d')
+df_per_states['state'] = df_per_states['state'].astype('category')
+df_states_abbr['State'] = df_states_abbr['State'].astype('category')
+df_states_abbr['Abbreviation'] = df_states_abbr['Abbreviation'].astype('category')
 
-  # casting types.. 
-  df['ObservationDate'] = pd.to_datetime(df['ObservationDate'])
-  df['Province/State'] = df['Province/State'].astype('category')
-  df['Country/Region'] = df['Country/Region'].astype('category')
-  df['Last Update'] = pd.to_datetime(df['Last Update'])
-  df['Confirmed'] = df['Confirmed'].astype('int64')
-  df['Deaths'] = df['Deaths'].astype('int64')
-  df['Recovered'] = df['Recovered'].astype('int64')
+# drop dateChecked...
+df_per_states = df_per_states.drop(columns=['dateChecked'])
 
-  # split last update into date n time...
-  df['last_update_date'] = df['Last Update'].dt.date
-  df['last_update_time'] = df['Last Update'].dt.time
-
-  # drop 'sNo', 'Last Update' column....
-  return df.drop(columns=['SNo', 'Last Update'])
-
-df = cleanData(df)
-
-dropdown_values = { country_region for country_region in df['Country/Region'] }
+print(df_states_abbr.dtypes)
 
 app.layout = dhtml.Div(children=[
-    dhtml.H1(children='Covid 19'),
+    dhtml.H1(children='Covid 19 - USA'),
 
     dhtml.Div(children='''
-        Covid Dashboard....
+      
     '''),
     dhtml.Br(),
     
     dcc.Dropdown(
-      id='country_dropdown',
+      id='state_list',
       options = [
-        { 'label': cr, 'value': cr }
-        for cr in dropdown_values
+        { 'label': row[0], 'value': row[1] }
+        for index, row in df_states_abbr.iterrows()
       ],
-      placeholder = 'Select a Country/Region'
+      placeholder = 'Select a US State'
     ),
-    dhtml.Div(id='chart_by_region')
+    dhtml.Div(id='chart')
 ])
 
 @app.callback(
-  Output('chart_by_region', 'children'),
-  [Input('country_dropdown', 'value')]
+  Output('chart', 'children'),
+  [Input('state_list', 'value')]
 )  
 
-def update_figure(selected_country_region):
-  filtered_df = df[df['Country/Region'] == selected_country_region]
-  filtered_df = filtered_df.drop(columns=['ObservationDate', 'Province/State', 'Country/Region', 'last_update_time'])
-  filtered_df = filtered_df.groupby('last_update_date').sum()
+def update_chart(selected_state):
+  filtered_df = df_per_states[df_per_states['state'] == selected_state]
   print(filtered_df.head(10))
   return dcc.Graph(
-      id="chart",
+      id="dccGraph",
       figure={
         'data': [
           go.Scatter(
-            x = filtered_df.index,
-            y = filtered_df['Confirmed'],
-            mode = 'lines+markers'
+            x = filtered_df['date'],
+            y = filtered_df['positive'],
+            mode = 'lines+markers',
+            name = 'Positive'
+          ),
+          go.Scatter(
+            x = filtered_df['date'],
+            y = filtered_df['negative'],
+            mode = 'lines+markers',
+            name = 'Negative'
+          ),
+          go.Scatter(
+            x = filtered_df['date'],
+            y = filtered_df['pending'],
+            mode = 'lines+markers',
+            name = 'Pending'
           )
         ],
         'layout' : go.Layout(
           title = 'Covid 19',
           xaxis = { 'title': 'Date' },
-          yaxis = { 'title': 'Confirmed' },
           hovermode='closest'
         )
       }
