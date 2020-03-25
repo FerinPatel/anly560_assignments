@@ -2,6 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as dhtml
 import plotly.graph_objs as go
+import dash_table as dt
 from dash.dependencies import Input, Output
 
 import plotly.graph_objs as go
@@ -14,7 +15,7 @@ df_per_states = pd.read_csv('data/us_states_covid19_daily.csv')
 df_states_abbr = pd.read_csv('data/state_abb.csv')
 
 # casting types..
-df_per_states['date'] = pd.to_datetime(df_per_states['date'],  format='%Y%m%d')
+df_per_states['date'] = [pd.to_datetime(d,  format='%Y%m%d').date() for d in df_per_states['date']]
 df_per_states['state'] = df_per_states['state'].astype('category')
 df_states_abbr['State'] = df_states_abbr['State'].astype('category')
 df_states_abbr['Abbreviation'] = df_states_abbr['Abbreviation'].astype('category')
@@ -40,18 +41,21 @@ app.layout = dhtml.Div(children=[
       ],
       placeholder = 'Select a US State'
     ),
-    dhtml.Div(id='chart')
+    dhtml.Div(id='chart', style={'width': '39%', 'display': 'inline-block', 'padding': '0 20'}),
+    dhtml.Div(id='table', style={'width': '59%', 'display': 'inline-block', 'padding': '0 20'})
 ])
 
 @app.callback(
-  Output('chart', 'children'),
+  [Output('chart', 'children'),Output('table', 'children')],
   [Input('state_list', 'value')]
 )  
 
 def update_chart(selected_state):
   filtered_df = df_per_states[df_per_states['state'] == selected_state]
+  table_data = filtered_df.drop(columns=['state', 'total'])
   print(filtered_df.head(10))
-  return dcc.Graph(
+  return [
+    dcc.Graph(
       id="dccGraph",
       figure={
         'data': [
@@ -80,7 +84,13 @@ def update_chart(selected_state):
           hovermode='closest'
         )
       }
+    ),
+    dt.DataTable(
+      id='dash_table',
+      columns=[{'name': i, 'id': i} for i in table_data.columns],
+      data=table_data.to_dict('rows')
     )
+  ]
 
 if __name__ == '__main__':
     app.run_server(debug=True)
