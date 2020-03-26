@@ -10,7 +10,7 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 import pandas as pd
 
-app = dash.Dash()
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 df_acc = pd.read_csv('data/us_covid19_daily.csv')
 df_per_states = pd.read_csv('data/us_states_covid19_daily.csv')
@@ -43,10 +43,12 @@ app.layout = dhtml.Div(children=[
       ],
       placeholder = 'Select a US State'
     ),
-    dbc.Row([
-      dbc.Col(dhtml.Div(id='chart'), width=2),
-      dbc.Col(dhtml.Div(id='table'), width=6)
-    ])
+    dbc.Container(
+      dbc.Row([
+        dbc.Col(dhtml.Div(id='chart'), width=6),
+        dbc.Col(dhtml.Div(id='table'), width=6)
+      ])
+    )
 ])
 
 @app.callback(
