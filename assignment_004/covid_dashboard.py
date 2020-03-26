@@ -5,6 +5,8 @@ import plotly.graph_objs as go
 import dash_table as dt
 from dash.dependencies import Input, Output
 
+import dash_bootstrap_components as dbc 
+
 import plotly.graph_objs as go
 import pandas as pd
 
@@ -41,8 +43,10 @@ app.layout = dhtml.Div(children=[
       ],
       placeholder = 'Select a US State'
     ),
-    dhtml.Div(id='chart', style={'width': '39%', 'display': 'inline-block', 'padding': '0 20'}),
-    dhtml.Div(id='table', style={'width': '59%', 'display': 'inline-block', 'padding': '0 20'})
+    dbc.Row([
+      dbc.Col(dhtml.Div(id='chart'), width=2),
+      dbc.Col(dhtml.Div(id='table'), width=6)
+    ])
 ])
 
 @app.callback(
@@ -53,7 +57,7 @@ app.layout = dhtml.Div(children=[
 def update_chart(selected_state):
   filtered_df = df_per_states[df_per_states['state'] == selected_state]
   table_data = filtered_df.drop(columns=['state', 'total'])
-  print(filtered_df.head(10))
+  # print(filtered_df.head(10))
   return [
     dcc.Graph(
       id="dccGraph",
