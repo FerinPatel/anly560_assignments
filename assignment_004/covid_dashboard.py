@@ -59,7 +59,8 @@ app.layout = dhtml.Div(children=[
 def update_chart(selected_state):
   filtered_df = df_per_states[df_per_states['state'] == selected_state]
   table_data = filtered_df.drop(columns=['state', 'total'])
-  # print(filtered_df.head(10))
+  label_state = ''.join([ row[0] for index, row in df_states_abbr.iterrows() if selected_state == row[1]])
+  
   return [
     dcc.Graph(
       id="dccGraph",
@@ -85,7 +86,7 @@ def update_chart(selected_state):
           )
         ],
         'layout' : go.Layout(
-          title = 'Covid 19',
+          title = label_state,
           xaxis = { 'title': 'Date' },
           hovermode='closest'
         )
