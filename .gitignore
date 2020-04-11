@@ -2,3 +2,5 @@
 *.ipynb
 
 tmapkey.py
+
+.DS_Store

@@ -1,13 +1,9 @@
-import dash
-import dash_bootstrap_components as dbc
-
 import pandas as pd
 import json
 import requests
 
-import layout
-
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+from  app import app
+from layout import app_layout
 
 #-- fetch COVID data -----------------------------------------------------------------------------
 response_coivd = requests.get('https://covidtracking.com/api/states/daily')
@@ -20,7 +16,11 @@ geo_states = json.loads(response_geoData.text)
 geo_states = response_geoData.json()
 
 #-- app layout ----------------------------------------------------------------
-app.layout = layout.app_layout(data, geo_states)
-  
+app.layout = app_layout(data, geo_states)
+
+#-- export data func ----------------------------------------------------------
+def retreive_data():
+  return data
+
 if __name__ == '__main__':
   app.run_server(debug=True)
