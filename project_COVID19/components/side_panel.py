@@ -14,6 +14,7 @@ def tab_userSelection(data):
         ]
     ),
     className="mt-3",
+    style={"height": "100%"}
   )
 
 def state_dropdown(data):

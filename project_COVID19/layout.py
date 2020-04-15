@@ -42,27 +42,30 @@ def app_layout(data, geo_states):
             )
           ),
 
-          dbc.Col(
-            dbc.Row([
-
+          dbc.Col([
+            dbc.Row(
               dbc.Col(
                 html.Div(
                   # Deaths/State
+                  id='death_t'
                 )
-              ),
+              ), no_gutters=True
+            ),
 
+            dbc.Row(
               dbc.Col(
                 html.Div( 
                   # TotalTested/State
+                  id='tested_t'
                 )
-              )
-            ])
-          )
-        ]),
+              ), no_gutters=True
+            )
+          ])
+        ], align='center', no_gutters=True),
 
         dbc.Row([
           # 2nd row for chart...
-          dbc.Col()
+          dbc.Col(html.Div(id='main_graph_div'))
         ]),
 
         dbc.Row([
